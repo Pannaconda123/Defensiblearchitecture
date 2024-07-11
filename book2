@@ -1,0 +1,332 @@
+	1. Auditing tools (pg 28)
+		a. Cisco Best Practices
+		b. Cisco AutoSecure
+		c. DISA (Defense information systems Agency)
+		d. CISecurity
+		e. Nipper-NG
+	2. Cisco Best Practices (pg 29) 'Cisco Guide to Harden Cisco IOS Devices'. Topics covered below
+		a. Monitor Cisco Security Advisories and Responses
+		b. Leverage Authentication, Authorization, and Accounting
+		c. Centralize Log Collection and Monitoring
+		d. Use Secure Protocols when Possible
+		e. Gain Traffic visibility with Netflow
+		f. Configuration Management
+	3. Cisco AutoSecure (30-31)
+a. Enables a very fast win for automatically configuring and enabling best practices
+b. Also provides auto remediation
+	4. DISA STIGs
+a. Provides a framework around secure config, as well as implementation guides
+	5. STIG severity 1
+a.  Must require authentication, must use 802.1x, group accounts must not be configured for use on the network devices, Emergency admin account must be set to appropriate level for when auth server is not online, devices must be password protected
+	6. Nipper NG (pg 39)
+	a. Currently EOL, but NG is a fork developed by Arpit Nandwani
+	7. Auditing Tool tips
+a. Audit before remediating
+b. Be sure to report as you go
+	8. Securing SNMP
+a. Versions prior to SNMPv3 expose community string
+b. Community strings are effectively password, which are often used for lateral movement
+	9. SNMP attacks
+a. Metasploit, NMAP, download IOS config 
+b. Exposing passwords via SNMP attacks
+	10. Hardening SNMP
+a. Disable SNMP when not required
+b. If necessary, use complex community string, use SNMPv3 at a minimum,  or limit polling access where SNMPv2 is required.
+	11. SNMPV3 ( pg 50)
+	12. Securing NTP
+a. max skew of 5 minutes
+	13. NTP design
+a. Suggested architecture is to have internal NTP, followed by external, then to internet facing NTP
+	14. NTP authentication
+a. NTP is sent over UDP, which can be spoofed
+b. supports authentication mechanism
+	15. NTP amplification attacks
+a. UDP services can be used for DDOS
+b. Attacker can send a spoofed NTP monlist to a vulnerable server
+	16. Monlist DoS (pg 56)
+a. ntpdc -c monlist 10.5.30.119. 
+	17. Bogons & Fullbogons Filtering (pg 58)
+a. Bogon means bogus
+b. illegitimate routes should not appear in a routing table
+	18.  Bogon Filters (pg 59)
+a. Filters are typically done on the edge router or firewall
+b. Consider dropping spoofed traffic
+c. Team Cymru has templates available ( www.nro.net/ipv4-free-pool-depleted)
+d. These are configured on the edge routing device themselves
+	19. Cisco IOS bog filter config
+a. to create an ACL, run "ip access-list extended bogons", then add "deny IP 10.0.0.0 0.255.255.255 any log" (this is one example)
+	20. Blackholes and darknets (pg 63)
+a. a darknet is unused/non-routed IP addresses owned by an org. This is not the same as the dark web hosted by TOR nodes. The darknet referred to here will be distinguished as IP darknet
+b. blackholes are used to drop traffic sent to specific IP addresses.
+	21. Why monitor IP darknets? (pg 64)
+	a. If malware is using the darknet 192.168.1.0/24 and the corporate subnet is 192.168.1.0/24, it is recommended to set up a darknet route to those addresses and monitor that traffic.
+b. Public IP darknets are used to collect internet attack data. Internal IP darknets are more actionable as they represent an active malware risk
+	22. What kind of traffic is sent to an IP darknet?
+	a. Darknet monitoring can offer insights to misconfig or malicious traffic
+	b. A server can be placed within a darknet space to gather packets and provide real-time analysis on that network and alert the security team if any activity occurs.
+	23. IP darknet architecture
+	a. All IP darknet traffic will be routed to a specified darknet router
+	b. The router will forward traffic to the packet vacuum sensor. ( a $40 router or standalone linux system can be used as well)
+	c. The sniffing interface and management interface are the minimum required interfaces for monitoring said traffic
+	24. Threats and Red Team Scenario - IPv6 and evil Foca (pg 72)
+	a. Uses a tool called Evil Foca, to replicate and create a MITM on an IPv6 network called neighbor advertisement spoofing.
+	25. IPv4: Nearly Exhausted (pg 73)
+	a. ~4.2 billion addresses available. /16 block costs nearly 1 million USD.
+	26. IPv6: Growing Fast
+a. ipv6 now makes up over 20% of the internet
+	27. IPv4 and 6
+	a. Ip 4 addresses are 32 bits
+	b. Ip 6 are 128 bits (340 undecillion addresses)
+	c. Ip6 allows stateless autoconfig
+	28. IP6 header (pg 76)
+	a. Ip4 header is 20 bytes. IP6 is 40 bytes, but has fewer fields. 
+	b. Ip6 assumes checksums (done at layer 4) will be done by the recipient system, freeing up this processing typically done by the router
+	29. IP6 header fields (77)
+	a. Traffic class, flow label, payload length, next header, hop limit, src and dest ip
+	30. IP6 extension headers.
+	a. First header is always 40 bytes
+	31. IP6 subnet size
+a. default is /64
+	32. Types of IP6 addresses
+a. link local - on the local subnet only
+b. Unique Local Address -  Used on privately owned networks, similar to private networks
+c. Global unicast addresses - Routed publicly
+	33. Determining IP6 Network Allocations
+	34. Link Local IP6 Stateless Address Auto Configuration (SLAAC) (pg 89)
+a. SLAAC
+	35. Privacy enhanced IP6 address generation
+	a. Small risk of duplicate addresses
+	b. Duplicate Address detection is created as a result
+	36. IP6 Temporary Address Lifetime (pg91)
+	a. Preferred lifetime will generate a new address for new connections
+	b. View the lifetimes with these commands 
+netsh interface ipv6 show address
+ip a ( linux)
+	Macos : ifconfig -L
+	37. Effect of Temporary IP6 addreses
+a. Ipv6 is often 1-7 days of preferred lifetime length
+	38. ::1 is the same as 127.0.0.1
+	39. IP6 multicast address
+a. Broadcast address is not supported, instead multicast addresses are used. 
+b. IP6 uses ff00::/8 for multicast
+c. FF02::1 - all nodes
+d. FF02::2  - All local Routers
+e. Multiple addresses are critical due to the size of IPV6 subnets.
+	40. Assigning IP6 addresses (pg 97)
+	a. Methods for assignment include : static assignment, stateless auto config, DHCPv6(does not assign the default gateway)
+	41. Securing IPV6
+	a. NIST publication (800-119)
+b. The following risks are outlines : attacker community's use of IP6, unauthorized deployment of IP6 on IP4 networks, Vulnerabilities present in ipv6 including zero-day's, complexities within a hybrid environment, immaturity of ipv6 products and processes, lack of vendor support
+	42. IPV6 Security issues
+a. Some firewalls can't process ipv6, scanning ipv6 is challenging, ipv6 tunnelling options allow filtering evasion and detection, unauthorized  IP6 routes can be advertised within internal systems
+	43. IP6 firewall support
+a. Some firewalls cannot support IPv6 or rely on a separate firewall to do so
+b. Iptables  will need a separate firewall. IP6tables is designed to filters ipv6 traffic
+	44. Ubee ipv6 firewall
+a. Many firewalls are not capable of supporting ipv6 traffic and route all traffic by default
+	45. Scanning ipv6 (pg 101)
+a. End-to-end ping sweeps are not possible
+b. multicast address become critical for performing local host discovery
+	46. Native Operating System IPv6 Discovery Tools
+a. Network discover protocol
+b. Nmap has nmap scripting engine scripts for discovering IPv6
+c. Metasploit can perform IPv6 multicast scans with the "ipv6-multicast_ping","ipv6_neighbor_router_advertisement", and "ipv6_neighbor"
+	47. IPv6 Asset inventory with Rumble Network Discovery (pg 104)
+a. Infosec tool used for network mapping
+b. Helps find systems in a network to provide details on said systems in a readable way
+	48. Other ways of Discovering IPv6
+a. Zeek: Looks for AAAA queries
+b. Firewall logs
+c. netflow
+d. ids
+e. ACLS
+f. SNMP MIBs
+	49. IP6 tunneling options
+a. 6to4 (translated ip6 to 4 without tunnelling), 6in4 (uses pre-configured tunnels to carry ipv6 traffic via ipv4), 6over4(requires ipv4 multicast), 6rd (rapid deployment), teredo ( carries ipv6 packets via udp , and traverse NAT gateways, ISATAP (uses DNS instead of multicast), GRE( tunnels both ipv4 and Ipv6)
+	50. Preventing and Detecting Ipv6 Tunneling
+a. IPV6 tunneling goes over port 41
+	51. Preventing and detecting Teredo (pg 109)
+a. uses port 3544 over UDP
+	52. Preventing and Detecting Ipv6 via Ipv4 tunnels with Cisco
+a. "router(config-if) deny 41 any any log"
+	53. Unauthorized ipv6 Router advertisements
+	a. A compromised system creates a 6to4 tunnel from the compromised client to the ipv6 internet
+	b. Compromised system sends ipv6 router advertisements to the local subnet, identifying the system as an ipv6 router
+	c. Local systems create a global unicast address, using the network prefix assigned by the rogue ipv6 router
+	d. Rogue advertisement Guard mitigates this risk
+	54. Rogue IPV6 router attack (pg 112)
+	55. Defending against Rogue RA attacks
+	a. Examine artifacts created by the MSF implementation of the attack
+	b. Detect Router Advertisements from two or more legitimate sources
+	c. Have all routers send their advertisements with "high priority" (default is medium)
+	d. Endpoint monitoring, or install RA guard
+	56. Hands-on Ipv6
+a. Try to implement IPv6 or use it in some fashion
+b. alternatively, tunnel ipv6 via Hurricane electric
+	57. Segmentation (pg 119)
+	a. Logical and physical separation of network separation
+	58. Network vs Access Segmentation (pg 120)
+	a. Network controls most commonly control access using ip addresses and ports
+b. access controls limit beyond basic network controls. One example is authentication limits
+	59. Segmentation principles
+a. Facilitate prevention and detection
+b. Systems and data with different classification levels must reside in different zones
+c. Control points are implemented at "gates" where all ingress and egress traffic is inspected where access control policies are enforced
+	d. Ensure availability is not impacted
+	60. Firewall architecture
+a. Simple networks with no public servers can use a two-legged design (lan and wan)
+b. simple networks offering limited public services may use a three-legged firewall. (DMZ, lan, wan)
+	61. DMZ design
+	a. Risk of a compromised DMZ internal systems must be mitigated
+b. dmz's with multiple servers should be broken into individual DMZ's
+c. Private VLAN's may also be used
+	62. Beyond DMZ :  Segmentation is more than 2 zones
+a. zones should be separated by business requirements ( PCI, critical assets, legacy systems)
+	63. Tiers- based on criticality and business impact
+a. Tier 1 : Critical components to maintain operations ; DC's, exchange, network infrastructure
+	b. Tier 2: Internal systems containing PII and associated data, DB's, sharepoint, web servers
+c. Tier 3 : external facing data providing services
+	64. Router ACL's
+a.  Most routers provide layer 3/4 fw capabilites
+b. Cisco routers provide standard and extended ACL's (extended filters apply on source and destination, as well as icmp types and TCP/UDP ports)
+	65. pfSense console
+a. PFSense console is commercial quality
+b. pre-installed on many small network appliances
+	66. Linux iptables
+a. comprised of tables which are chains of rules applied within each table. Mentioned below
+b. Input: inbound traffic to an interface, output: outbound traffic from an interface, forward: traffic between interfaces(routed packets), a chain is a list of fw rules applied in order
+c. default behavior is accept
+	67. Iptables simple ruleset
+a. accept all : -A INPUT -I eth0 -p all -j ACCEPT
+	68. Network Segmentation issue
+a.  Overly permissive rules can be a problem if relying on network segmentation too heavily
+	69. Login Segmentation
+a. Adhere to principle of least privilege
+b. Create compensating controls such as jump boxes, secondary accounts, local admin random password, administrative workstations
+	70. Azure privileged identity management (PIM) (pg132)
+a. Just in time access, Time restrictions,  required approval workflows, Enforced MFA, Notification of access use, reporting
+	71. Application Layer Security (pg136)
+a. layer 7 refers to the application layer
+	72. Application proxies (pg 137)
+a. Some examples are email gateways and web proxies
+	73. Proxy Types
+a. forward: systems that request access througha  proxy to access a resource
+b. Reverse: service protected by forcing connections through a proxy (web app firewall/ load balancer)
+	74. Reverse proxies, ZTNA and SASE
+a. SASE ( secure access service edge) :  Incorporates SD-WAN, NGFW as a service, secure web gateways and CASB.
+b. Zero Trust Network Architecture ( ZTNA) : Creates identity and context based logical access boundary based on applications.
+Zero trust is a subset of SASE, SASE restricts access of all edges, sites, mobiles users, and cloud resources. 
+	75. Web Proxy (pg 141)
+a. Intermediary for web access : used for protecting internal assets. Many attacks rely on client-side communications to be effective, allowing for improvement in the security posture of an org.
+	76. Web proxy capabilities
+a. Web proxies will look at various application level details about https and http connections. Additional info such as MIME type, user agent, and file contents involved in every web connection. 
+	77. SSL interception (pg 143)
+a. Encryption blinds a proxy
+b. SSL interception allows analysis of encrypted sites
+	78. Site categories 
+a. web proxies are often associated with category filtering
+b. Treat it similarly to implicit denies on a firewall
+	79. Bypassing site categories
+a. Businesses close or sites aren't needed. Attackers by them and use them for phishing.
+	80. Website allow lists (pg 146)
+a. More secure approach is to create allow lists
+b. More effort and maintenance required
+	81. Web Proxy Alternatives
+a. Terms  and conditions before access can cause malware to fail as it cannot proceed to properly connect
+	82. Proxy deployment
+a. Two modes : Transparent, all traffic goes through regardless of endpoint config
+Explicit: Endpoints must be configured to use the proxy
+b. Transparent proxy sits inline on the internet and does not require the endpoint to know it exists
+c. Explicit proxy has advantages because it requires the endpoints to know it exists
+	83. Explicit Proxy Advantages
+a. Malware is often not proxy aware
+b. only works if outbound internet access is denied except for the web proxy
+c. Create an implicit deny for non-proxy access
+d. explicit proxy also forces internet flow through the proxy
+	84. Explicit proxy advantages - Delegated DNS
+a. DNS query is performed by the proxy
+b. This will limit exfiltration of data through DNS tunnels
+	85. Authenticated vs unauthenticated proxy (pg 151)
+	a. Malware commonly is not proxy aware
+b. Explicit proxy plus authentication is most secure, even proxy aware malware struggles with credentials
+c. Unauthenticated proxies imply trust without verification
+	86. Proxy Placement ( 152)
+	a. Segmentation should be considered for dumb devices
+b. systems supporting proxy need access to it
+c. This access can be through always on vpn
+	87. Web Proxy access options
+a. See diagram
+	88. Squid
+a. Open source solution
+b. Supports explicit and transparent
+c. ClamAV for AV checks, AV checks, integrate with ICAP, supports web caching, Supports SSL interception
+	89. Internet content adaptation protocol (Icap)
+a. Used to extent proxy capabilities
+b. AV and malware analysis, includes multiple av engines, ICAP requires advanced knowledge and programming
+	90. ICAP diagram PG 152
+	91. Web proxy review (pg 157)
+A. Provides central control and visibility
+b. stops malware at stage two
+c. warns or blocks users about new sites
+	92. SMTP Proxy (pg 160)
+	a. Web and email are the most common ways to enter a network
+b. client-side phishing attacks
+c. end users web and email, so attack vector is massive
+	93. SMTP prevention and detection
+a. SMTP proxies are capable of : analysis, sender auth, per email encryption, handling phishing domains, rate limiting, modifying and auto-routing emails, sender blocking
+	94. Bayesian analysis (pg 162)
+a. uses statistical probability to understand most malicious emails
+b. word checks, email header, and metadata analysis
+	95. Sender policy framework (SPF) PG. 163
+a. DNS record that validates email from its source
+b.  Based on MX and A records
+	96. Domain Keys Identified Mail (DKIM) Pg 165
+a. Uses a digital signature to validate email : uses asymmetric kets
+b. Keys are created for each selector
+	97. Domain-based Message Authentication, Reporting, and compliance  (DMARC) PG 167
+a. DMARC verifies domain authentication via SPF and DKIM
+b. DMARC policy dictates actions and protection level
+* Policy - Monitor, Quarantine, Reject
+* Alignment -  Strict, Relaxed
+c.  Strictmode required a DMARC,DNS,TXT, record per subdomain 
+	98. Sender Authentication
+a. Not all email systems support DMARC
+b. protection only applies to company-owned domains (typo squatted or cousin domains are not protected)
+	99. DNStwist PG 169
+a. SMTP proxy can protect against cousin domains
+b. dnstwist calculates permutations against a domain
+c. DNS twist calculates all possible outputs and exports into a CSV and then verifies if the domain is registered
+	100. Intentional email modification
+a.  SMTP proxies and emails systems can add to a message
+*custom headers or footers
+* Disclaimers
+b. Requires rules to x when y occurs ( if external source add the external message)
+	101. Combating Open-Source intelligence PG 171
+a. A good architect protects an Org
+b. register fake email accounts for online services
+* attempts to access or email these accounts is malicious behavior
+	102. Rate-limiting PG 172
+a. Rate limiting protects by slowing mass email
+b. SMTP proxies have a default threshold, inbound rate limitin could be early detection while outbound can prevent can affect compromised accounts
+	103. SMTP proxy review
+a. SMTP proxy is mature tech that deals with spam
+b. use sender authentication ( dkim,dmarc, etc)
+c. cousin domains for quarantine and detect
+d. use rate-limiting
+	104. Overview
+* Layer 3
+* switch and router best practices
+* auditing router security
+* securing SNMP
+* securing NTP
+* bogon filtering
+* Blackhols and darknets
+* Ipv6
+* securing ipv6
+* segmentation
+* web proxy
+* SMTP Proxy
+	
+	
+	
+	
