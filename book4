@@ -1,0 +1,353 @@
+	1. Data Security PG 4
+		a. Architecture needs to include focus on what matters most
+			i. What is most important
+	2. Know thy organization PG 5
+		a. Defensible architecture requires org awareness
+			i. What are the assets? Where are they? Why are they critical? What do they need?
+			ii. Network-centric
+			iii. Data-centric
+	3. Full stack security PG 6
+		a. Applications rarely involve single components
+		b. Web apps for example use servers and leverage a separate a db server
+	4. Application problem PG 7
+		a. Custom apps/ websites are problematic
+			i. Packet inspection fails
+			ii. No signatures for custom apps
+			iii. No app control for custom apps
+	5. Web application firewalls (WAF) PG 10
+		a. A web app firewall is an app firewall for http apps
+		b. WAF is a reverse proxy or local module on the web server
+		c. Provides control around custom web apps without patches
+	6. OWASP top 10
+		a. WAF has strong focus on mitigating OWAP TOP 10
+			i. Most 10 critical vulns
+			ii. Injection, access controls, and broken authentication
+		b. Web applications compose of 43% of breaches
+		c. IPS or NGFW mitigate basic versions
+			i. Not designed to handle HTTP deeply
+			ii. Complex payloadsd using HTTP protocol
+	7. Reverse Proxy PG 12
+		a. Handles incoming requests
+		b. Routes them to appropriate back-end service
+		c. Can be on-prem or cloud
+	8. SSL offloading PG 13
+		a. Reverse proxy design includes ssl offloading (commonly)
+		b. Process
+			i. Clients establish ssl/tls connection
+			ii. Then reverse proxy establishes connection to the end serverusing http
+			iii. End-to-end encryption is supported
+		c. Proxy inspection has full access to every request and response
+	9. Web app firewall capabilities PG 14
+		a. SSL offloading
+		b. Content decoding
+		c. Automatic learning
+		d. HTTP attack mitigation
+		e. Virtual patching
+		f. Dynamic security actions, not just allow/deny
+		g. Rate limiting
+	10. ModSecurity PG 15
+		a. ModSecurity is OS WAF
+			i. Can be deployed as reverse proxy or local
+			ii. Allows granular control
+		b. Commercial solutions exist
+			i. May not be as flexible as MOD
+			ii. Rule syntax  example : SecRule VARIABLES OPERATION [ACTIONS]
+			iii. Example of rule : Secrule REQUEST_HEADERS:HOST "!^$" "deny,phase:1"
+			iv. Modsecurity phases
+				1) Request headers
+				2) Request body
+				3) Response headres
+				4) Response body
+				5) Logging
+	11. WAF Challenges PG 16
+		a. Not foolproof
+			i. There are methods to identify a WAF (fingerprinting)
+			ii. Multiple Techniques to bypass WAF
+		b. Potential WAF issues
+			i. Each web server reacts differently to requests
+			ii. There are valid encoding techniques
+			iii. OS interpret paths differently
+			iv. Evasion techniques
+	12. Evasion example PG 17
+		a. SecRule REQUEST_FILENAME "@streq /admin.php" \"chain,phase:2,deny"
+SecRule ARGS:user  "!^[a-zA-Z0-9]+$"
+		b. Rule looks for request to /admin.php with invalid user parameter
+			i. If user field does not match regex deny the request
+	13. WAF Normalization PG 18
+		a. WAF should attempt some level of normalization
+			i. Paths, variables and everything else
+	14. Websockets PG19
+		a. Web application firewalls are fairly mature
+			i. Yet new protocols may not be supported by every vendor
+			ii. WAF solutions still don't support websockets
+				1) Websockets: full-duplex communication over a single TCP connection. API allows web apps to use WebSockets
+	15. Deploying WAF PG 20
+		a. Automatic Learning
+			i. Traffic routes through WAF for period of time
+			ii. The WAF determines : Methods, entry points variables, content types, statistics heuristics
+			iii. After learning can flip to deny
+		b. Manual, All settings manually tuned
+			i. May support templates
+				1) Select OS
+				2) Select web server
+				3) Select programming language
+				4) Select back-end database
+			ii. Lots of fine-tuning
+	16. WAF allow listing PG 21
+		a. Default config to deny list known evil
+			i. FAR more secure to only allow expected traffic
+	17. Central Web server PG 22
+		a. Key advantage is centralized protection
+			i. Possible to apply security policies across web servers
+	18. Web vulnerability scanner integration PG 23
+		a. Vulnerability web scanners are specific to web servers
+			i. Scanners can integrate with a WAF
+			ii. Aunetix, HP webInspect, IBM app scan
+			iii. Can be automatic or manual
+		b. Vulnerability reports can be imported into WAF solutions
+			i. Provides virtual patching of vulnerability
+			ii. Automatic integration geared towards minimal false positives, which means the vuln might be exploitable
+	19. Virtual Patching PG 24
+		a. Business push developers to build sites and move on
+			i. Websites stay vulnerable as a result
+		b. Virtual patching uses a WAF to mitigate the risk without recoding the application
+			i. Trust fix is to fix the vulnerable code
+			ii. Virtual patching should be temporary
+				1) Often ends up being permanent
+	20. Moving Past allow/deny PG 25
+		a. Action against clients is not limited to allow or deny
+			i. Dynamic actions can be taken
+			ii. The higher the risk identified the more restriction applied
+				1) Odd character submissions require email validation to continue
+				2) Account or checkout lockouts requiring a phone call or chat
+	21. Content Routing PG 26
+		a. WAF can dynamically route traffic among web servers
+			i. Capability intended for performance and load balancing
+			ii. Can be used to add content to existing servers virtually
+	22. WebLabyrinth PG 27
+		a. Design is to confuse or break scanners
+		b. Supports automated alerting
+		c. Normally requires set up on each server
+			i. Works best with robots.txt
+	23. WAF detection PG 28
+		a. Strong preventative technology
+			i. Detection capabilities outweigh prevention
+		b. Public sites are going to be attacked
+			i. Detection helps identify who, what, where
+		c. Best detection capabilities are for internal servers
+			i. Near impossible to attack a web server without flagging
+		d. Nearly impossible to attack a webserver without flagging
+	24. Web app firewall review PG 29
+		a. Reverse proxy to secure web servers
+			i. Consider a commercial WAF or ModSecurity
+		b. Implentation should include normalization of data (paths, variables) 
+		c. Patch identified vulnerabilities
+		d. Add centralized protection and detection capabilities 
+		e. Move past traditional allow and deny mentality
+		f. Bolster detection capabilities
+	25. Database Monitoring and Controls  PG 34
+		a. Critical data is often stored in a database
+			i. Database security is different than web security
+		b. Database security
+			i. Controlling who can access data
+			ii. Applying limits to data access
+			iii. Identify sensitive data locations
+			iv. Heavy detection focus
+	26. Database logging pg 35
+		a. Most db's have logging disabled by default
+			i. Otherwise generic service logs but missing audit trails
+		b. Recommended logging capabilities
+			i. Change tracking - Record changes
+			ii. Compliance criteria -  Success and failure events
+			iii. Trigger logs - Custom events
+			iv. Query logs - SQL statements
+		c. Each cause performance issues
+	27. Database security PG 36
+		a. Built-in security is decently strong
+			i. Local or centralized authentication
+			ii. Access can be restricted to DB, table, or columns
+				1) Some DB's even support record level access
+			iii. Supports groups or custom roles
+			iv. Defines ownership and privilege granting
+	28. Database security issue PG 37
+		a. DB's are commonly paired with web servers
+			i. Web servers pass-thru authentication to the db
+			ii. Common for a service account to be used
+		b. Creates a key security issue
+			i. User1 logs in to web server to run report
+			ii. Web server logs into the db with the service account
+			iii. Often user1 can escalate to the privileges 
+	29. Content discovery PG 38
+		a. Securing data requires knowing where data resides
+			i. Certain fields usually intended for sensitive data
+				1) SSN, Credit Card numbers, Driver's license
+			ii. Other fields are  often have sensitive data as well
+				1) Comments, additional info, notes
+		b. Content discovery must be done on a regular basis
+			i. Involves crawling through databases on file systems looking for data
+	30. Content Discovery Script example PG 39
+		a. Less than 40 lines of code including 10 lines of comments
+			i. Loops through each db, table, and column. Then checks all values
+	31. Data Masking PG 40
+		a. Possible to show partial matches or entirely mask data
+			i. Data masking hides actual values from certain users
+		b. One user sees social security number 123-45-6789
+		c. The second user sees social xxx-xx-6789
+		d. Masking allows business processes to continue
+	32. Database activity monitor (DAM) /  Database firewall (DBF)
+		a. Database monitoring fills gaps in Database security
+		b. Supports heterogenous databases
+			i. MySQL, Microsoft SQL, Oracle, MariaDB, IBM DB2
+			ii. Some support big data platforms like HDFS and HIVE
+		c. Can apply rules on original user vs. service account
+		d. Auditing and logging significantly approved
+		e. Adds significant prevention capabilities
+		f. Apply controls based on requesting application
+	33. Deployment Modes PG 42
+		a. Local software installed on the DB server
+			i. 3-5% performance impact
+		b. Reverse proxy in front of server
+			i. Clients access proxy directly
+			ii. Proxy controls request to database
+		c. Passive monitor out-of-band
+			i. Port mirror or tap sends copy of traffic to DAM/DBF
+	34. Behavior monitoring PG 43
+		a. Most database security solutions implement dynamic learning / behavior monitoring
+			i. Goal is to profile user activity
+			ii. What data is accessed normally
+	35. User content awareness PG 44
+		a. Possible for DAM/DBF to identify actual user requesting data
+			i. Regardless of service account usage
+		b. Software solution requires visibility into logs of requesting service
+			i. SQL server report services (SSRS)
+		c. Proxy may need application to pass service account and user
+			i. Works by passing both users with a delimiter or extra field
+			ii. Requires making changes to front-end system like SSRS DB Name Master username jhenderson|svc_account
+		d. Passive solution needs visibility to both SQL and front-end traffic
+	36. Application awareness PG 45
+		a. Should access limitations be different to Excel VS SSRS
+			i. What about Powershell, Python, PHP, or .NET?
+		b. Key offering of DAM/DBF solutions is application awareness
+			i. Audit logs include application
+			ii. Allows for situation awareness
+			iii. Allows controls based on application
+		c. May wish to limit access to sensitive columns to certain applications
+			i. Or limit the number of rows that can be retrieved
+	37. Record limits PG 46
+		a. Large data breaches are occurring more often
+			i. A web service is the common target
+		b. DAM tracks record counts and can integrate with a SIEM
+			i. Zeek can provide similar support
+		c. Even if protection controls don't exist using record limits
+			i. Alert on records pulled by source or app that exceed threshold
+				1) Threshold per single
+				2) Threshold per aggregate sessions within a time frame
+				3) Potentially thrshold alert per all sources per time frame
+	38. Database monitoring and controls Review PG 47
+		a. Web app and db controls are necessary
+			i. Databases are critical components with lots of data
+		b. Built-in security mechanisms or a DAM should be used to:
+			i. Limitcb
+	39. Access Controls PG 49
+		a. Data protection
+			i. Access control and encryption
+		b. Access control focuses on limiting access to data
+			i. Goal is model of least privilege and detection
+		c. Data encryption focuses on making data unreadable
+			i. Primarily a physical security control
+	40. Windows permissions PG 51
+		a. File and folder permissions set per users or group
+			i. Permissions inherit from parent objects
+			ii. Inherited permissions can be removed or overridden
+			iii. Access is cumulative
+		b. Explicit permissions win over inherited
+			i. Example : Deny user1 on C:\test
+			ii. Allow user1 on c:\test\subfolder
+			iii. User1 can access c:\test\subfolder
+	41. Windows Rights PG 52
+		a. Windows rights outrank access controls
+			i. Change permissions as needed
+		b. Backup Files and directories
+		c. Restore files and directories
+		d. Default rights include anyone who is an administrator
+	42. Windows auditing PG 53
+		a. Auditing is supported for just about every action in Windows
+			i. Requires audit object access to be enabled
+			ii. Records actions against files/folders/printers/AD objcets
+		b. Auditing is a security function
+			i. Denied access = Why?
+				1) Rogue internal users
+				2) Hackers performing laterally movement
+				3) Ransomware
+	43. Volume Shadow copy service PG 54
+		a. Windows VSS keeps record of changes on disk
+			i. Windows automatically creates shadow copies over time
+			ii. Always created during certain events
+		b. Intended for rollback purposes
+		c. Ransomware tries to use vssadmin.exe to delete copies
+		d. Malware may crawl shadow copies
+	44. Linux Permissions PG 55
+		a. Permissions (r,w,x)
+			i. Read is 4, write is 2, execute is 1
+			ii. Permission 6 is read and write
+		b. Permissions are assigned to owner, group, and everyone
+			i. 741 = owner has rwx, group has r, and everyone has execute
+	45. Linux special permissions PG 56
+		a. Permissions have security ramifications
+		b. Set-User Identification (SUID) - Executes file as file owner
+			i. /usr/bin/passwd uses SUID to change password
+		c. Warning attackers use SUID privilege escalation
+			i. Find / -perm -4022 -exec ls -l {} \; | 2>/dev/null
+			ii. Set-group identification (SGID) -Executes file as group owner
+				1) On folders, new content is owned by group owner of SGID
+			iii. Sticky bit - protects files from being removed from other users
+				1) Only root and owner can delete
+	46. Access control monitoring PG 57
+		a. Users gain permissions over time
+		b. Find excessive permission issues like everyone group allowed
+			i. Owner can verify user access
+			ii. Owner could be top-level folder owner or mapped in script
+			iii. Automatic alerting using Windows events
+	47. Access control review PG 58
+		a. Limit special rights
+		b. Monitor for insecure permission usage
+		c. Verify permissions enforce the least privilege
+		d. Do more than prevent access
+	48. Data encryption pg 60
+		a. Data at rest is still at risk of being stolen
+			i. USB drives, swappable drives, laptops, mobile devices
+				1) Portable media and devices are high risk
+				2) Accidental loss still constitutes a data brech
+			ii. Ponemon estimates average cost per record $146
+		b. Encryption at rest protects data from disclosure
+			i. Significantly decreases costs and risk of data breach
+			ii. Implementation varies based on what is being encrypted
+	49. Encrypted data PG 61
+		a. Assume stolen data or accidental loss of media
+			i. Encryption makes data unreadable
+		b. Now assume hacker gains remote access to server
+			i. Data is encrypted and mounted for user access
+			ii. Does the hacker have access to the data?
+			iii. Is the data cleartext or encrypted
+		c. Most encryption solutions do not protect mounted data
+	50. Database encryption pg 62
+		a. Modern database systems natively support encryption
+			i. Encryption capable at multiple layers
+		b. Database-level -  Encrypts entire database file at rest
+		c. Table-level - Encryption per table
+		d. Cell-level - specific collumns
+	51. Encrypted File-system (EFS) PG 63
+		a. EFS can be sued to encrypt a user's files or folders
+			i. Symmetric key protected by asymmetric key
+			ii. Contents encrypted with symmetric key
+		b. Default symmetric key is protected by user password
+			i. User key or recovery agent needed to access data
+			ii. Local administrator is default recovery agent
+			iii. Local PKI will be used over self-signed certificate
+				1) Allows multiple key recovery agents to be issues
+	52. Full Disk Encryption PG 64
+		a. Instead of encrytion files, folder, databases, why not just encrypt everything
+			i. Performance decrease is usually 5-10%
+		b. Depending on the solution disk encryption requires user interaction
+		
+			
